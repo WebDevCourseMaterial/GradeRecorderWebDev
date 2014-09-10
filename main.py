@@ -14,29 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import webapp2
-import jinja2
 import os
 
 from google.appengine.api import users
-from google.appengine.ext import ndb
-
-from models import Student, Assignment, GradeEntry
-import logging
+from handlers import base_handlers, insert_handlers, delete_handlers, csv_handlers
+import jinja2
 import utils
-import csv_handlers
-import delete_handlers
-
+import webapp2
 
 # Jinja environment instance necessary to use Jinja templates.
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)), autoescape=True)
+jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+                               autoescape=True)
 
-class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        user = users.get_current_user()
-        if not user:
-            self.redirect(users.create_login_url(self.request.uri))
-            return
+class MainHandler(base_handlers.BasePage):
+    def get_for_user(self, user):
         assignments, assignments_map = utils.get_assignments(user)
         students, students_map, teams = utils.get_students(user)
         grade_entries = utils.get_grade_entries(user, assignments_map, students_map)
@@ -63,68 +54,16 @@ class MainHandler(webapp2.RequestHandler):
                                                  'user_email': user.email(),
                                                  'logout_url': users.create_logout_url("/")}))
 
-    def post(self):
-        user = users.get_current_user()
-        if not user:
-            self.redirect(users.create_login_url(self.request.uri))
-            return
-        next_active_assignemnt = None
-        if (self.request.get('type') == 'Student'):
-            rose_username = self.request.get('rose_username')
-            new_student = Student(parent=utils.get_parent_key(user),
-                                  id=rose_username,
-                                  first_name=self.request.get('first_name'),
-                                  last_name=self.request.get('last_name'),
-                                  rose_username=rose_username,
-                                  team=self.request.get('team'))
-            new_student.put()
-        elif (self.request.get('type') == 'Assignment'):
-            active_assignment = Assignment(parent=utils.get_parent_key(user),
-                                           name=self.request.get('assignment_name'))
-            if len(self.request.get('assignment_entity_key')) > 0:
-                assignment_key = ndb.Key(urlsafe=self.request.get('assignment_entity_key'))
-                if assignment_key:
-                    assignment = assignment_key.get()
-                    if assignment:
-                        active_assignment = assignment
-                        active_assignment.name = self.request.get('assignment_name')
-            active_assignment.put()
-            next_active_assignemnt = active_assignment.key.urlsafe()
-        elif (self.request.get('type') == 'SingleGradeEntry'):
-            assignment_key = ndb.Key(urlsafe=self.request.get('assignment_key'))
-            student_key = ndb.Key(urlsafe=self.request.get('student_key'))
-            student = student_key.get()
-            score = int(self.request.get('score'))
-            new_grade_entry = GradeEntry(parent=assignment_key,
-                                         id=student.rose_username,
-                                         assignment_key=assignment_key,
-                                         student_key=student_key,
-                                         score=score)
-            new_grade_entry.put()
-            next_active_assignemnt = assignment_key.urlsafe()
-        elif (self.request.get('type') == 'TeamGradeEntry'):
-            assignment_key = ndb.Key(urlsafe=self.request.get('assignment_key'))
-            score = int(self.request.get('score'))
-            team = self.request.get('team')
-            student_query = Student.query(Student.team==team, ancestor=utils.get_parent_key(user))
-            for student in student_query:
-                new_grade_entry = GradeEntry(parent=assignment_key,
-                                             id=student.rose_username,
-                                             assignment_key=assignment_key,
-                                             student_key=student.key,
-                                             score=score)
-                new_grade_entry.put()
-            next_active_assignemnt = assignment_key.urlsafe()
-        if next_active_assignemnt:
-          self.redirect("/?active_assignemnt=" + next_active_assignemnt)
-        else:
-          self.redirect("/")
 
 app = webapp2.WSGIApplication([
     ("/", MainHandler),
-    ("/bulk_student_import", csv_handlers.BulkStudentImportAction),
+    ("/add_student", insert_handlers.AddStudentAction),
+    ("/insert_assignment", insert_handlers.InsertAssignmentAction),
+    ("/add_single_grade_entry", insert_handlers.AddSingleGradeEntryAction),
+    ("/add_team_grade_entry", insert_handlers.AddTeamGradeEntryAction),
     ("/delete_student", delete_handlers.DeleteStudentAction),
     ("/delete_assignment", delete_handlers.DeleteAssignmentAction),
     ("/delete_grade_entry", delete_handlers.DeleteGradeEntryAction),
+    ("/bulk_student_import", csv_handlers.BulkStudentImportAction),
     ("/grade_recorder_grades.csv", csv_handlers.ExportCsvAction)
 ], debug=True)

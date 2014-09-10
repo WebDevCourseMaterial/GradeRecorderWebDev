@@ -1,11 +1,11 @@
+import base_handlers
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import utils
-import webapp2
 
 
-class DeleteStudentAction(webapp2.RequestHandler):
-    def post(self):
+class DeleteStudentAction(base_handlers.BaseAction):
+    def post_for_user(self, user):
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
@@ -19,8 +19,8 @@ class DeleteStudentAction(webapp2.RequestHandler):
         self.redirect(self.request.referer)
 
 
-class DeleteAssignmentAction(webapp2.RequestHandler):
-    def post(self):
+class DeleteAssignmentAction(base_handlers.BaseAction):
+    def post_for_user(self, user):
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))
@@ -30,8 +30,8 @@ class DeleteAssignmentAction(webapp2.RequestHandler):
         assignment_key.delete();
         self.redirect("/")
 
-class DeleteGradeEntryAction(webapp2.RequestHandler):
-    def post(self):
+class DeleteGradeEntryAction(base_handlers.BaseAction):
+    def post_for_user(self, user):
         user = users.get_current_user()
         if not user:
             self.redirect(users.create_login_url(self.request.uri))

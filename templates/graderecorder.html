@@ -127,7 +127,7 @@
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <div class="h4 modal-title" id="add-student-modal-title">Add Student</div>
         </div>
-        <form action="" method="POST" class="form-horizontal" role="form">
+        <form action="/add_student" method="POST" class="form-horizontal" role="form">
           <div class="modal-body">
             <div class="form-group">
               <label for="first_name" class="col-sm-2 control-label">First:</label>
@@ -153,7 +153,6 @@
                 <input name="team" type="text" class="form-control" placeholder="Team (if applicable)">
               </div>
             </div>
-            <input type="hidden" name="type" value="Student">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -344,7 +343,7 @@
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h4 class="modal-title" id="assignment-modal-title">Add Assignment</h4>
         </div>
-        <form class="form-horizontal" action="" method="POST">
+        <form class="form-horizontal" action="/insert_assignment" method="POST">
           <div class="modal-body">
             <div class="form-group">
               <label for="assignment_name" class="col-sm-2 control-label">Name:</label>
@@ -353,7 +352,6 @@
                 <input name="assignment_entity_key" type="text" class="hidden">
               </div>
             </div>
-            <input type="hidden" name="type" value="Assignment">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -380,9 +378,8 @@
             </div>
           </div>
         </div>
-        <form class="form-horizontal" action="" method="POST">
+        <form id="add-grade-entry-form" class="form-horizontal" action="/add_single_grade_entry" method="POST">
           <div class="modal-body">
-            <input id="grade-entry-type-input" type="hidden" name="type" value="SingleGradeEntry">
             <div id="grade-entry-by-student-form-group" class="form-group">
               <label for="student_key" class="col-sm-3 control-label">Student:</label>
               <div class="col-sm-9">

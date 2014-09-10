@@ -3,19 +3,14 @@ import cStringIO
 import csv
 import re
 
-from google.appengine.api import users
+import base_handlers
 from google.appengine.ext import ndb
 from models import Student, GradeEntry
 import utils
-import webapp2
 
 
-class BulkStudentImportAction(webapp2.RequestHandler):
-    def post(self):
-        user = users.get_current_user()
-        if not user:
-            self.redirect(users.create_login_url(self.request.uri))
-            return
+class BulkStudentImportAction(base_handlers.BaseAction):
+  def post_for_user(self, user):
         if len(self.request.get("remove_all_students")) > 0:
           utils.remove_all_students(user)
         imported_file = self.request.params["bulk-import-file"].value
@@ -46,12 +41,8 @@ def process_roster(imported_file, user):
 
 
 
-class ExportCsvAction(webapp2.RequestHandler):
-  def post(self):
-    user = users.get_current_user()
-    if not user:
-        self.redirect(users.create_login_url(self.request.uri))
-        return
+class ExportCsvAction(base_handlers.BaseAction):
+  def post_for_user(self, user):
     export_student_name = len(self.request.get("student_name")) > 0
     export_rose_username = len(self.request.get("rose_username")) > 0
     export_team = len(self.request.get("team")) > 0
