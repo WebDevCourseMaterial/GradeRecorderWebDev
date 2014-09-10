@@ -49,6 +49,7 @@ def remove_all_grades_for_student(user, student_key):
   for grade in grades_for_student:
     grade.key.delete()
 
+
 def remove_all_students(user):
   """ Removes all grades and all students for a user. (use with caution) """
   all_grades = GradeEntry.query(ancestor=get_parent_key(user))
