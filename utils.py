@@ -37,24 +37,24 @@ def get_grade_entries(user, assignments_map, students_map):
 
 
 def remove_all_grades_for_assignment(user, assignment_key):
-  """ Removes all grades for the given student. """
-  grades_for_assignment = GradeEntry.query(ancestor=assignment_key)
-  for grade in grades_for_assignment:
+  """ Removes all grades for the given assignment. """
+  grades_for_assignment_query = GradeEntry.query(ancestor=assignment_key)
+  for grade in grades_for_assignment_query:
     grade.key.delete()
 
 
 def remove_all_grades_for_student(user, student_key):
   """ Removes all grades for the given student. """
-  grades_for_student = GradeEntry.query(GradeEntry.student_key==student_key, ancestor=get_parent_key(user))
-  for grade in grades_for_student:
+  grades_for_student_query = GradeEntry.query(GradeEntry.student_key==student_key, ancestor=get_parent_key(user))
+  for grade in grades_for_student_query:
     grade.key.delete()
 
 
 def remove_all_students(user):
   """ Removes all grades and all students for a user. (use with caution) """
-  all_grades = GradeEntry.query(ancestor=get_parent_key(user))
-  for grade in all_grades:
+  all_grades_query = GradeEntry.query(ancestor=get_parent_key(user))
+  for grade in all_grades_query:
     grade.key.delete()
-  all_students = Student.query(ancestor=get_parent_key(user))
-  for student in all_students:
+  all_students_query = Student.query(ancestor=get_parent_key(user))
+  for student in all_students_query:
     student.key.delete()
