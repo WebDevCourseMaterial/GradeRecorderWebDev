@@ -28,7 +28,6 @@ rh.gr.enableButtons = function() {
 	});
 
 	$('#add-grade-entry-modal').on('shown.bs.modal', function() {
-		// CONSIDER: Attempt to guess the next student needing a grade.
 		if (rh.gr.currentAssignmentKey.length > 0) {
 			$("select[name=assignment_key]").val(rh.gr.currentAssignmentKey);
 		}
@@ -155,6 +154,7 @@ rh.gr.enableButtons = function() {
 rh.gr.updateTable = function() {
 	var table = $('#grade-entry-table').DataTable();
 	table.search(rh.gr.currentAssignmentKey).draw();
+	$("input[type=search]").val("");
 };
 
 rh.gr.updatePageTitle = function() {
