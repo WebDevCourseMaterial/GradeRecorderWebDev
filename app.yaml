@@ -16,7 +16,7 @@ handlers:
 #Main handler
 - url: .*
   script: main.app
-  login: required
+  # TODO: Make login: required
 
 libraries:
 - name: webapp2

@@ -30,11 +30,12 @@ def get_students(user):
 def get_grade_entries(user, assignments_map, students_map):
   """ Gets all of the grade entries for this user.
         Replaces the assignment_key and student_key with an assignment and student. """
-  grade_entries = # TODO: Query for all GradeEntries for this user , then fetch()
+  grade_entries = # TODO: Query for all GradeEntries for this user, then fetch()
   for grade_entry in grade_entries:
     grade_entry.assignment = assignments_map[grade_entry.assignment_key]
     grade_entry.student = students_map[grade_entry.student_key]
   return grade_entries
+
 
 def remove_all_grades_for_assignment(user, assignment_key):
   """ Removes all grades for the given assignment. """

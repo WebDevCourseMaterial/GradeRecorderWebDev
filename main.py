@@ -26,13 +26,16 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__
 
 app = webapp2.WSGIApplication([
     ("/", main_page_handler.GradeRecorderPage),
+
     ("/add_student", insert_handlers.AddStudentAction),
     ("/insert_assignment", insert_handlers.InsertAssignmentAction),
     ("/add_single_grade_entry", insert_handlers.AddSingleGradeEntryAction),
     ("/add_team_grade_entry", insert_handlers.AddTeamGradeEntryAction),
+
     ("/delete_student", delete_handlers.DeleteStudentAction),
     ("/delete_assignment", delete_handlers.DeleteAssignmentAction),
     ("/delete_grade_entry", delete_handlers.DeleteGradeEntryAction),
+
     ("/bulk_student_import", csv_handlers.BulkStudentImportAction),
     ("/grade_recorder_grades.csv", csv_handlers.ExportCsvAction)
 ], debug=True)
