@@ -1,11 +1,13 @@
-import base_handlers
+from google.appengine.api import users
 from google.appengine.ext import ndb
 from models import Student, Assignment, GradeEntry
 import utils
+import webapp2
 
 
-class AddStudentAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
+class AddStudentAction(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
     rose_username = self.request.get('rose_username')
     new_student = Student(parent=utils.get_parent_key(user),
                           id=rose_username,
@@ -14,25 +16,25 @@ class AddStudentAction(base_handlers.BaseAction):
                           rose_username=rose_username,
                           team=self.request.get('team'))
     new_student.put()
+    self.redirect("/")
 
 
-class InsertAssignmentAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
+class InsertAssignmentAction(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
     active_assignment = Assignment(parent=utils.get_parent_key(user),
                                    name=self.request.get('assignment_name'))
     if len(self.request.get('assignment_entity_key')) > 0:
-        assignment_key = ndb.Key(urlsafe=self.request.get('assignment_entity_key'))
-        if assignment_key:
-            assignment = assignment_key.get()
-            if assignment:
-                active_assignment = assignment
-                active_assignment.name = self.request.get('assignment_name')
+      assignment_key = ndb.Key(urlsafe=self.request.get('assignment_entity_key'))
+      assignment = assignment_key.get()
+      active_assignment = assignment
+      active_assignment.name = self.request.get('assignment_name')
     active_assignment.put()
-    return active_assignment.key.urlsafe()
+    self.redirect("/?active_assignemnt=" + active_assignment.key.urlsafe())
 
 
-class AddSingleGradeEntryAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
+class AddSingleGradeEntryAction(webapp2.RequestHandler):
+  def post(self):
     assignment_key = ndb.Key(urlsafe=self.request.get('assignment_key'))
     student_key = ndb.Key(urlsafe=self.request.get('student_key'))
     student = student_key.get()
@@ -43,11 +45,12 @@ class AddSingleGradeEntryAction(base_handlers.BaseAction):
                                  student_key=student_key,
                                  score=score)
     new_grade_entry.put()
-    return assignment_key.urlsafe()
+    self.redirect("/?active_assignemnt=" + assignment_key.urlsafe())
 
 
-class AddTeamGradeEntryAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
+class AddTeamGradeEntryAction(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
     assignment_key = ndb.Key(urlsafe=self.request.get('assignment_key'))
     score = int(self.request.get('score'))
     team = self.request.get('team')
@@ -59,5 +62,5 @@ class AddTeamGradeEntryAction(base_handlers.BaseAction):
                                      student_key=student.key,
                                      score=score)
         new_grade_entry.put()
-    return assignment_key.urlsafe()
+    self.redirect("/?active_assignemnt=" + assignment_key.urlsafe())
 
