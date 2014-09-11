@@ -3,46 +3,47 @@ import cStringIO
 import csv
 import re
 
-import base_handlers
+from google.appengine.api import users
 from google.appengine.ext import ndb
 from models import Student, GradeEntry
 import utils
+import webapp2
 
 
-class BulkStudentImportAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
-        if len(self.request.get("remove_all_students")) > 0:
-          utils.remove_all_students(user)
-        imported_file = self.request.params["bulk-import-file"].value
-        process_roster(imported_file, user)
-        self.redirect(self.request.referer)
+class BulkStudentImportAction(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
+    if len(self.request.get("remove_all_students")) > 0:
+      utils.remove_all_students(user)
+    imported_file = self.request.params["bulk-import-file"].value
+    process_roster(imported_file, user)
+    self.redirect(self.request.referer)
 
 def process_roster(imported_file, user):
-    try:
-      csv_file = cStringIO.StringIO(imported_file)
-      # Read the first kb to ensure the file is a valid CSV file.
-      csv.Sniffer().sniff(csv_file.read(1024), ",")
-      csv_file.seek(0)
-      reader = csv.DictReader(csv_file, dialect="excel")
-    except:
-      raise Exception("Invalid CSV file")
-    reader.fieldnames = [re.compile('[\W_]+', flags=re.UNICODE).sub('', field).lower()
-                         for field in reader.fieldnames]
-    for row in reader:
-        rose_username = row.get("username", None)
-        new_student = Student(parent=utils.get_parent_key(user),
-                              id=rose_username,
-                              first_name=row.get("first", None),
-                              last_name=row.get("last", None),
-                              team=row.get("team", None),
-                              rose_username=rose_username)
-        new_student.put()
+  try:
+    csv_file = cStringIO.StringIO(imported_file)
+    # Read the first kb to ensure the file is a valid CSV file.
+    csv.Sniffer().sniff(csv_file.read(1024), ",")
+    csv_file.seek(0)
+    reader = csv.DictReader(csv_file, dialect="excel")
+  except:
+    raise Exception("Invalid CSV file")
+  reader.fieldnames = [re.compile('[\W_]+', flags=re.UNICODE).sub('', field).lower()
+                       for field in reader.fieldnames]
+  for row in reader:
+    rose_username = row.get("username", None)
+    new_student = Student(parent=utils.get_parent_key(user),
+                          id=rose_username,
+                          first_name=row.get("first", None),
+                          last_name=row.get("last", None),
+                          team=row.get("team", None),
+                          rose_username=rose_username)
+    new_student.put()
 
 
-
-
-class ExportCsvAction(base_handlers.BaseAction):
-  def post_for_user(self, user):
+class ExportCsvAction(webapp2.RequestHandler):
+  def post(self):
+    user = users.get_current_user()
     export_student_name = len(self.request.get("student_name")) > 0
     export_rose_username = len(self.request.get("rose_username")) > 0
     export_team = len(self.request.get("team")) > 0

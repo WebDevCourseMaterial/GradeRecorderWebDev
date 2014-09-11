@@ -3,38 +3,38 @@ from models import Assignment, Student, GradeEntry
 
 
 def get_parent_key(user):
-    return ndb.Key("Entity", user.email().lower())
+  return ndb.Key("Entity", user.email().lower())
+
 
 def get_assignments(user):
-    """ Gets all of the assignments for this user and makes a key map for them. """
-    assignments = # TODO: Query for all Assignments for this user order by name, then fetch()
-    assignments_map = {}
-    for assignment in assignments:
-        assignments_map[assignment.key] = assignment
-    return assignments, assignments_map
+  """ Gets all of the assignments for this user and makes a key map for them. """
+  assignments = # TODO: Query for all Assignments for this user order by name, then fetch()
+  assignments_map = {}
+  for assignment in assignments:
+    assignments_map[assignment.key] = assignment
+  return assignments, assignments_map
 
 
 def get_students(user):
-    """ Gets all of the students for this user and makes a key map for them. """
-    students = # TODO: Query for all Students for this user order by rose_username, then fetch()
-    students_map = {}
-    teams = []
-    for student in students:
-        students_map[student.key] = student
-        if student.team not in teams:
-          teams.append(student.team)
-    return students, students_map, teams
+  """ Gets all of the students for this user and makes a key map for them. """
+  students = # TODO: Query for all Students for this user order by rose_username, then fetch()
+  students_map = {}
+  teams = []
+  for student in students:
+    students_map[student.key] = student
+    if student.team not in teams:
+      teams.append(student.team)
+  return students, students_map, sorted(teams)
 
 
 def get_grade_entries(user, assignments_map, students_map):
-    """ Gets all of the grade entries for this user.
-          Replaces the assignment_key and student_key with an assignment and student. """
-    grade_entries = # TODO: Query for all GradeEntries for this user , then fetch()
-    for grade_entry in grade_entries:
-        grade_entry.assignment = assignments_map[grade_entry.assignment_key]
-        grade_entry.student = students_map[grade_entry.student_key]
-    return grade_entries
-
+  """ Gets all of the grade entries for this user.
+        Replaces the assignment_key and student_key with an assignment and student. """
+  grade_entries = # TODO: Query for all GradeEntries for this user , then fetch()
+  for grade_entry in grade_entries:
+    grade_entry.assignment = assignments_map[grade_entry.assignment_key]
+    grade_entry.student = students_map[grade_entry.student_key]
+  return grade_entries
 
 def remove_all_grades_for_assignment(user, assignment_key):
   """ Removes all grades for the given assignment. """
@@ -58,3 +58,4 @@ def remove_all_students(user):
   all_students_query = # TODO: Query for all Students for this user
   for student in all_students_query:
     student.key.delete()
+
