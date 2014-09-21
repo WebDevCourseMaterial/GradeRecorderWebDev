@@ -22,15 +22,18 @@ class AddStudentAction(webapp2.RequestHandler):
 class InsertAssignmentAction(webapp2.RequestHandler):
   def post(self):
     user = users.get_current_user()
-    active_assignment = Assignment(parent=utils.get_parent_key(user),
-                                   name=self.request.get('assignment_name'))
-    if len(self.request.get('assignment_entity_key')) > 0:
-      assignment_key = ndb.Key(urlsafe=self.request.get('assignment_entity_key'))
+    urlsafe_entity_key = self.request.get('assignment_entity_key')
+
+    if len(urlsafe_entity_key) > 0:
+      # Edit
+      assignment_key = ndb.Key(urlsafe=urlsafe_entity_key)
       assignment = assignment_key.get()
-      active_assignment = assignment
-      active_assignment.name = self.request.get('assignment_name')
-    active_assignment.put()
-    self.redirect("/?active_assignemnt=" + active_assignment.key.urlsafe())
+      assignment.name = self.request.get('assignment_name')
+    else:
+      assignment = Assignment(parent=utils.get_parent_key(user),
+                              name=self.request.get('assignment_name'))
+    assignment.put()
+    self.redirect("/?active_assignment=" + assignment.key.urlsafe())
 
 
 class AddSingleGradeEntryAction(webapp2.RequestHandler):
@@ -45,7 +48,7 @@ class AddSingleGradeEntryAction(webapp2.RequestHandler):
                                  student_key=student_key,
                                  score=score)
     new_grade_entry.put()
-    self.redirect("/?active_assignemnt=" + assignment_key.urlsafe())
+    self.redirect("/?active_assignment=" + assignment_key.urlsafe())
 
 
 class AddTeamGradeEntryAction(webapp2.RequestHandler):
@@ -62,5 +65,5 @@ class AddTeamGradeEntryAction(webapp2.RequestHandler):
                                      student_key=student.key,
                                      score=score)
         new_grade_entry.put()
-    self.redirect("/?active_assignemnt=" + assignment_key.urlsafe())
+    self.redirect("/?active_assignment=" + assignment_key.urlsafe())
 

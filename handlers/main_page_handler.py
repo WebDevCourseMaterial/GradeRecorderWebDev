@@ -26,7 +26,7 @@ class GradeRecorderPage(webapp2.RequestHandler):
         metadata.append("na")  # Average is NA
     template = main.jinja_env.get_template("templates/graderecorder.html")
     self.response.out.write(template.render({'assignments': assignments,
-                                             'active_assignemnt': self.request.get('active_assignemnt'),
+                                             'active_assignment': self.request.get('active_assignment'),
                                              'students': students,
                                              'teams': teams,
                                              'grade_entries': grade_entries,
