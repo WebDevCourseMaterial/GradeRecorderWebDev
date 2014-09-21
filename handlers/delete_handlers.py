@@ -27,7 +27,7 @@ class DeleteGradeEntryAction(webapp2.RequestHandler):
   def post(self):
     grade_entry_key = ndb.Key(urlsafe=self.request.get('grade_entry_to_delete_key'))
     grade = grade_entry_key.get()
-    next_active_assignemnt = grade.assignment_key.urlsafe()
+    next_active_assignment = grade.assignment_key.urlsafe()
     grade_entry_key.delete();
-    return next_active_assignemnt
+    return next_active_assignment
 
