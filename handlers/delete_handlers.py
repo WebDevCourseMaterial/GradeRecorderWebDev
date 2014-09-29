@@ -13,6 +13,7 @@ class DeleteStudentAction(webapp2.RequestHandler):
       student_key = ndb.Key(urlsafe=self.request.get('student_to_delete_key'))
       utils.remove_all_grades_for_student(user, student_key)
       student_key.delete();
+    self.redirect(self.request.referer)
 
 
 class DeleteAssignmentAction(webapp2.RequestHandler):
@@ -21,13 +22,14 @@ class DeleteAssignmentAction(webapp2.RequestHandler):
     assignment_key = ndb.Key(urlsafe=self.request.get('assignment_to_delete_key'))
     utils.remove_all_grades_for_assignment(user, assignment_key)
     assignment_key.delete();
+    self.redirect(self.request.referer)
 
 
 class DeleteGradeEntryAction(webapp2.RequestHandler):
   def post(self):
     grade_entry_key = ndb.Key(urlsafe=self.request.get('grade_entry_to_delete_key'))
     grade = grade_entry_key.get()
-    next_active_assignment = grade.assignment_key.urlsafe()
+    urlsafe_assignment_key = grade.assignment_key.urlsafe()
     grade_entry_key.delete();
-    return next_active_assignment
+    self.redirect("/?active_assignment=" + urlsafe_assignment_key)
 
